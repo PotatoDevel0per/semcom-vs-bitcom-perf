@@ -1,0 +1,19 @@
+defaults:
+  - default
+
+model:
+  latent_dim: 128
+  quantizer: "scalar"
+
+channel:
+  type: "awgn"
+  snr_db: 10.0
+
+train:
+  epochs: 100
+  lr: 1.0e-3
+  weight_decay: 1.0e-4
+  scheduler: "cosine"
+
+output:
+  checkpoint_template: "experiments/checkpoints/semantic_enc_dim{latent_dim}.pth"

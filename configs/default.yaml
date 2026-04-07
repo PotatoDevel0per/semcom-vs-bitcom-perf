@@ -1,0 +1,29 @@
+seed: 42
+device: "cuda"  # "cuda" | "cpu" | "mps"
+
+data:
+  root: "./data"
+  batch_size: 128
+  num_workers: 4
+
+model:
+  latent_dim: 128       # 64 | 128 | 256
+  quantizer: "scalar"   # "scalar" | "vector"
+  vq_num_codes: 256     # K-means 코드북 크기 (vector quantizer 사용 시)
+
+channel:
+  type: "awgn"          # "awgn" | "rayleigh" | "packet_loss"
+  snr_db: 10.0
+  packet_loss_rate: 0.0
+
+train:
+  epochs: 100
+  lr: 1.0e-3
+  weight_decay: 1.0e-4
+  scheduler: "cosine"
+
+eval:
+  repeat: 5
+  bit_budgets: [256, 512, 1024, 5120, 51200]  # bytes
+  snr_sweep: [0, 5, 10, 20]                   # dB
+  packet_loss_sweep: [0.01, 0.05, 0.10]

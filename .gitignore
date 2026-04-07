@@ -1,0 +1,16 @@
+experiments/checkpoints/*.pth
+experiments/results/*.csv
+experiments/figures/*.png
+experiments/figures/*.pdf
+experiments/logs/
+data/
+__pycache__/
+*.pyc
+*.pyo
+.DS_Store
+.env
+*.egg-info/
+dist/
+.pytest_cache/
+.ipynb_checkpoints/
+.venv/
