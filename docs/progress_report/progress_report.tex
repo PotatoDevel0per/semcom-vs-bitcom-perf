@@ -7,6 +7,7 @@
 \usepackage{textcomp}
 \usepackage{xcolor}
 \usepackage{booktabs}
+\graphicspath{{figures/}}
 \def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
     T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
 
@@ -161,6 +162,21 @@ JPEG $q$=95    & 1{,}300.8\,B & 91.70\% & 0.88 \\
 JPEG reaches its peak accuracy per bit at $q$=60 ($1.15{\times}10^{-4}$) but
 requires over 850\,bytes for approximately 79\% accuracy.
 
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=\columnwidth]{acc_vs_byte_budget.png}}
+\caption{Top-1 accuracy vs.\ transmission size (bytes). Semantic encoders
+(stars) achieve comparable accuracy to JPEG (dashed line) at a fraction of
+the byte budget.}
+\label{fig:acc_byte}
+\end{figure}
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=\columnwidth]{accuracy_per_bit.png}}
+\caption{Accuracy per bit vs.\ transmission size. Semantic encoders
+consistently outperform JPEG across all byte budgets.}
+\label{fig:apb}
+\end{figure}
+
 \subsection{Semantic Evaluation}
 
 Semantic encoders were evaluated under AWGN
@@ -218,29 +234,43 @@ Semantic dim=256       & 256    & 92.16\% & 4.50 \\
 \end{center}
 \end{table}
 
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=\columnwidth]{snr_robustness.png}}
+\caption{Top-1 accuracy vs.\ SNR (dB) under AWGN channel. Higher latent
+dimensions exhibit greater robustness at low SNR.}
+\label{fig:snr}
+\end{figure}
+
+\begin{figure}[htbp]
+\centerline{\includegraphics[width=\columnwidth]{packet_loss_robustness.png}}
+\caption{Top-1 accuracy vs.\ packet loss rate. All semantic models maintain
+accuracy above 92\% even at 10\% packet loss.}
+\label{fig:pktloss}
+\end{figure}
+
 % ──────────────────────────────────────────────
 \section{Preliminary Findings}
 
 \textbf{(1) Dramatic bandwidth reduction.}
-Semantic dim=64 achieves 91.94\% accuracy using only 64\,bytes---2.1\% of the
-3{,}072-byte lossless baseline---while JPEG requires 1{,}301\,bytes to reach
-comparable accuracy (91.70\%).
+As shown in Fig.~\ref{fig:acc_byte}, Semantic dim=64 achieves 91.94\% accuracy
+using only 64\,bytes---2.1\% of the 3{,}072-byte lossless baseline---while JPEG
+requires 1{,}301\,bytes to reach comparable accuracy (91.70\%).
 
 \textbf{(2) Communication efficiency.}
-Semantic dim=64 achieves an accuracy per bit of $17.96{\times}10^{-4}$,
-approximately \textbf{15.6$\times$ higher} than the best JPEG configuration
-($q$=60, $1.15{\times}10^{-4}$).
+Fig.~\ref{fig:apb} shows that Semantic dim=64 achieves an accuracy per bit of
+$17.96{\times}10^{-4}$, approximately \textbf{15.6$\times$ higher} than the
+best JPEG configuration ($q$=60, $1.15{\times}10^{-4}$).
 
 \textbf{(3) AWGN robustness.}
-Even at SNR\,=\,0\,dB, Semantic dim=256 maintains 91.43\% accuracy.
-The dim=64 model shows greater sensitivity to low SNR (88.67\% at 0\,dB) owing
-to its compressed representation.
+As illustrated in Fig.~\ref{fig:snr}, even at SNR\,=\,0\,dB, Semantic dim=256
+maintains 91.43\% accuracy. The dim=64 model shows greater sensitivity to low
+SNR (88.67\% at 0\,dB) owing to its compressed representation.
 
 \textbf{(4) Packet loss robustness.}
-All semantic models are remarkably robust to packet loss.
-The dim=256 accuracy fluctuates by less than 0.05\% across 1\%--10\% loss
-rates, suggesting that the latent representation distributes task-relevant
-information redundantly across dimensions.
+Fig.~\ref{fig:pktloss} shows that all semantic models are remarkably robust to
+packet loss. The dim=256 accuracy fluctuates by less than 0.05\% across
+1\%--10\% loss rates, suggesting that the latent representation distributes
+task-relevant information redundantly across dimensions.
 
 % ──────────────────────────────────────────────
 \section{Updated Project Schedule}
