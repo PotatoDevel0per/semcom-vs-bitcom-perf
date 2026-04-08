@@ -1,0 +1,191 @@
+[
+  {
+    "method": "semantic",
+    "latent_dim": 64,
+    "channel": "awgn",
+    "snr_db": 0,
+    "top1_acc": 0.8867,
+    "avg_bytes": 64.0,
+    "accuracy_per_bit": 0.0017318359375
+  },
+  {
+    "method": "semantic",
+    "latent_dim": 64,
+    "channel": "awgn",
+    "snr_db": 5,
+    "top1_acc": 0.9132,
+    "avg_bytes": 64.0,
+    "accuracy_per_bit": 0.00178359375
+  },
+  {
+    "method": "semantic",
+    "latent_dim": 64,
+    "channel": "awgn",
+    "snr_db": 10,
+    "top1_acc": 0.9194,
+    "avg_bytes": 64.0,
+    "accuracy_per_bit": 0.001795703125
+  },
+  {
+    "method": "semantic",
+    "latent_dim": 64,
+    "channel": "awgn",
+    "snr_db": 20,
+    "top1_acc": 0.9252,
+    "avg_bytes": 64.0,
+    "accuracy_per_bit": 0.00180703125
+  },
+  {
+    "method": "semantic",
+    "latent_dim": 64,
+    "channel": "packet_loss",
+    "loss_rate": 0.01,
+    "top1_acc": 0.9246,
+    "avg_bytes": 64.0,
+    "accuracy_per_bit": 0.001805859375
+  },
+  {
+    "method": "semantic",
+    "latent_dim": 64,
+    "channel": "packet_loss",
+    "loss_rate": 0.05,
+    "top1_acc": 0.9224,
+    "avg_bytes": 64.0,
+    "accuracy_per_bit": 0.0018015625
+  },
+  {
+    "method": "semantic",
+    "latent_dim": 64,
+    "channel": "packet_loss",
+    "loss_rate": 0.1,
+    "top1_acc": 0.9232,
+    "avg_bytes": 64.0,
+    "accuracy_per_bit": 0.001803125
+  },
+  {
+    "method": "semantic",
+    "latent_dim": 128,
+    "channel": "awgn",
+    "snr_db": 0,
+    "top1_acc": 0.9049,
+    "avg_bytes": 128.0,
+    "accuracy_per_bit": 0.00088369140625
+  },
+  {
+    "method": "semantic",
+    "latent_dim": 128,
+    "channel": "awgn",
+    "snr_db": 5,
+    "top1_acc": 0.9192,
+    "avg_bytes": 128.0,
+    "accuracy_per_bit": 0.00089765625
+  },
+  {
+    "method": "semantic",
+    "latent_dim": 128,
+    "channel": "awgn",
+    "snr_db": 10,
+    "top1_acc": 0.9214,
+    "avg_bytes": 128.0,
+    "accuracy_per_bit": 0.0008998046875
+  },
+  {
+    "method": "semantic",
+    "latent_dim": 128,
+    "channel": "awgn",
+    "snr_db": 20,
+    "top1_acc": 0.924,
+    "avg_bytes": 128.0,
+    "accuracy_per_bit": 0.00090234375
+  },
+  {
+    "method": "semantic",
+    "latent_dim": 128,
+    "channel": "packet_loss",
+    "loss_rate": 0.01,
+    "top1_acc": 0.9221,
+    "avg_bytes": 128.0,
+    "accuracy_per_bit": 0.00090048828125
+  },
+  {
+    "method": "semantic",
+    "latent_dim": 128,
+    "channel": "packet_loss",
+    "loss_rate": 0.05,
+    "top1_acc": 0.9232,
+    "avg_bytes": 128.0,
+    "accuracy_per_bit": 0.0009015625
+  },
+  {
+    "method": "semantic",
+    "latent_dim": 128,
+    "channel": "packet_loss",
+    "loss_rate": 0.1,
+    "top1_acc": 0.9218,
+    "avg_bytes": 128.0,
+    "accuracy_per_bit": 0.0009001953125
+  },
+  {
+    "method": "semantic",
+    "latent_dim": 256,
+    "channel": "awgn",
+    "snr_db": 0,
+    "top1_acc": 0.9143,
+    "avg_bytes": 256.0,
+    "accuracy_per_bit": 0.000446435546875
+  },
+  {
+    "method": "semantic",
+    "latent_dim": 256,
+    "channel": "awgn",
+    "snr_db": 5,
+    "top1_acc": 0.9216,
+    "avg_bytes": 256.0,
+    "accuracy_per_bit": 0.00045
+  },
+  {
+    "method": "semantic",
+    "latent_dim": 256,
+    "channel": "awgn",
+    "snr_db": 10,
+    "top1_acc": 0.9216,
+    "avg_bytes": 256.0,
+    "accuracy_per_bit": 0.00045
+  },
+  {
+    "method": "semantic",
+    "latent_dim": 256,
+    "channel": "awgn",
+    "snr_db": 20,
+    "top1_acc": 0.9237,
+    "avg_bytes": 256.0,
+    "accuracy_per_bit": 0.000451025390625
+  },
+  {
+    "method": "semantic",
+    "latent_dim": 256,
+    "channel": "packet_loss",
+    "loss_rate": 0.01,
+    "top1_acc": 0.924,
+    "avg_bytes": 256.0,
+    "accuracy_per_bit": 0.000451171875
+  },
+  {
+    "method": "semantic",
+    "latent_dim": 256,
+    "channel": "packet_loss",
+    "loss_rate": 0.05,
+    "top1_acc": 0.9241,
+    "avg_bytes": 256.0,
+    "accuracy_per_bit": 0.000451220703125
+  },
+  {
+    "method": "semantic",
+    "latent_dim": 256,
+    "channel": "packet_loss",
+    "loss_rate": 0.1,
+    "top1_acc": 0.9245,
+    "avg_bytes": 256.0,
+    "accuracy_per_bit": 0.000451416015625
+  }
+]

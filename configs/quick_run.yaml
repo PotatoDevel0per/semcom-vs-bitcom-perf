@@ -1,0 +1,33 @@
+# Progress Report용 빠른 실험 설정 (epoch 수 축소)
+seed: 42
+device: "mps"
+
+data:
+  root: "./data"
+  batch_size: 128
+  num_workers: 0   # macOS multiprocessing 이슈 방지
+
+model:
+  latent_dim: 128
+  quantizer: "scalar"
+
+channel:
+  type: "awgn"
+  snr_db: 10.0
+  packet_loss_rate: 0.0
+
+train:
+  epochs: 30
+  lr: 1.0e-3
+  weight_decay: 1.0e-4
+  scheduler: "cosine"
+  momentum: 0.9
+
+eval:
+  repeat: 1
+  bit_budgets: [256, 512, 1024, 5120, 51200]
+  snr_sweep: [0, 5, 10, 20]
+  packet_loss_sweep: [0.01, 0.05, 0.10]
+
+output:
+  checkpoint: "experiments/checkpoints/classifier_resnet18.pth"
