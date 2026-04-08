@@ -1,0 +1,315 @@
+\documentclass[conference]{IEEEtran}
+\IEEEoverridecommandlockouts
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{booktabs}
+\def\BibTeX{{\rm B\kern-.05em{\sc i\kern-.025em b}\kern-.08em
+    T\kern-.1667em\lower.7ex\hbox{E}\kern-.125emX}}
+
+\begin{document}
+
+\title{Progress Report: Performance Comparison of Semantic Communication vs.\ Raw-Bit Transmission}
+
+\author{
+\IEEEauthorblockN{Jihyeok Lee}
+\IEEEauthorblockA{
+    \textit{Dept. of Computer Science and Engineering} \\
+    \textit{POSTECH} \\
+    Pohang, Republic of Korea \\
+    20266243@postech.ac.kr
+}
+}
+
+\maketitle
+
+% ──────────────────────────────────────────────
+\begin{abstract}
+This progress report summarizes the work completed to date on a performance
+comparison between semantic communication and raw-bit (JPEG-compressed)
+transmission for task-oriented mobile computing.
+We established a complete simulation pipeline using CIFAR-10 image
+classification as the downstream task.
+A ResNet-18 classifier, serving as the baseline, achieved a test accuracy of
+93.51\%.
+Semantic encoders with latent dimensions of 64, 128, and 256 were trained
+end-to-end and evaluated under AWGN and packet-loss channel conditions.
+Initial results show that the semantic approach (dim\,=\,64, 64\,bytes) achieves
+91.94\% accuracy at SNR\,=\,10\,dB---using only 2.1\% of the bandwidth required
+by the lossless baseline---while outperforming JPEG compression by a factor of
+approximately 15$\times$ in accuracy per bit.
+\end{abstract}
+
+% ──────────────────────────────────────────────
+\section{Introduction}
+
+The proliferation of AI-driven mobile applications demands efficient data
+transmission for inference tasks over bandwidth-constrained wireless channels.
+Conventional raw-bit transmission, even with source coding such as JPEG,
+transmits pixel-level information regardless of the downstream task, leading to
+poor utilization of limited channel resources.
+Semantic communication addresses this issue by extracting and transmitting only
+task-relevant features, thereby reducing the payload while preserving task
+performance \cite{b1,b2}.
+
+This project quantitatively compares semantic communication and JPEG-based
+raw-bit transmission under realistic wireless channel conditions, focusing on
+three metrics: Top-1 classification accuracy, accuracy per bit~(ApB), and
+robustness to channel degradation (SNR variation and packet loss).
+
+% ──────────────────────────────────────────────
+\section{Problem Statement}
+
+Given a bandwidth-constrained wireless channel, the transmitter must send a
+representation of an image $x$ such that the receiver can correctly classify it.
+The key tension is between the transmission size (bytes) and task accuracy.
+For a transmission budget $B$ (bytes), we compare two approaches:
+
+\begin{itemize}
+    \item \textbf{Baseline:} JPEG compression at quality $q$, where image $x$
+          is compressed to approximately $B$ bytes, transmitted, decompressed,
+          and fed to a classifier.
+    \item \textbf{Semantic:} A learned encoder $f_{\phi}(x) \in \mathbb{R}^{d}$
+          extracts a $d$-dimensional latent vector, quantized to $d$ bytes via
+          8-bit scalar quantization, transmitted through a noisy channel, and
+          classified by a lightweight head $g_{\psi}$.
+\end{itemize}
+
+The channel is modeled as AWGN with varying SNR, Rayleigh fading, or
+block-level packet loss.
+
+% ──────────────────────────────────────────────
+\section{Work Completed}
+
+\subsection{Simulation Environment}
+
+The full experimental pipeline was implemented in Python/PyTorch and
+version-controlled on GitHub. The system runs on an Apple MPS (M-series GPU).
+Key components are as follows.
+
+\begin{itemize}
+    \item \textbf{Dataset:} CIFAR-10 (50{,}000 train / 10{,}000 test,
+          $32{\times}32$ RGB)
+    \item \textbf{Channel simulators:} AWGN, Rayleigh fading, block-level
+          packet loss
+    \item \textbf{Quantizer:} 8-bit uniform scalar quantization
+    \item \textbf{Baseline:} JPEG compression via PIL at quality levels
+          $q \in \{1, 3, 5, 10, 20, 40, 60, 80, 95\}$
+\end{itemize}
+
+\subsection{Baseline: ResNet-18 Classifier}
+
+A ResNet-18 classifier was adapted for CIFAR-10 ($3{\times}3$ first
+convolution, stride~1, no max-pooling) and trained for 30 epochs using SGD
+with cosine annealing (lr\,=\,0.1, weight decay\,=\,$5{\times}10^{-4}$,
+momentum\,=\,0.9).
+The model achieved a test accuracy of \textbf{93.51\%}, which serves as the
+upper-bound reference for lossless transmission.
+
+\subsection{Semantic Encoder Training}
+
+Three SemanticEncoder models (latent dim $\in \{64, 128, 256\}$) were trained
+end-to-end using the same ResNet-18 backbone with a linear projection head,
+paired with a two-layer MLP classifier head.
+Training used Adam (lr\,=\,$1{\times}10^{-3}$, cosine annealing, 30 epochs).
+Results are summarized in Table~\ref{tab:semantic_train}.
+
+\begin{table}[htbp]
+\caption{Semantic Encoder Training Results}
+\label{tab:semantic_train}
+\begin{center}
+\begin{tabular}{ccc}
+\toprule
+\textbf{Latent Dim} & \textbf{Transmission Size} & \textbf{Best Test Acc.} \\
+\midrule
+64  & 64\,B  & 92.52\% \\
+128 & 128\,B & 92.25\% \\
+256 & 256\,B & 92.42\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+\subsection{Baseline Evaluation (JPEG)}
+
+JPEG compression was evaluated at nine quality levels.
+The ResNet-18 classifier (Section~III-B) was applied to decompressed images
+without retraining. Results are shown in Table~\ref{tab:jpeg}.
+
+\begin{table}[htbp]
+\caption{JPEG Baseline Evaluation Results}
+\label{tab:jpeg}
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Method} & \textbf{Avg.\ Bytes} & \textbf{Top-1 Acc.} & \textbf{ApB ($\times10^{-4}$)} \\
+\midrule
+Raw (lossless) & 3{,}072\,B & 93.51\% & 0.38 \\
+JPEG $q$=10    & 699.5\,B   & 42.47\% & 0.76 \\
+JPEG $q$=40    & 801.3\,B   & 72.63\% & 1.13 \\
+JPEG $q$=60    & 853.8\,B   & 78.83\% & 1.15 \\
+JPEG $q$=80    & 960.6\,B   & 85.36\% & 1.11 \\
+JPEG $q$=95    & 1{,}300.8\,B & 91.70\% & 0.88 \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+JPEG reaches its peak accuracy per bit at $q$=60 ($1.15{\times}10^{-4}$) but
+requires over 850\,bytes for approximately 79\% accuracy.
+
+\subsection{Semantic Evaluation}
+
+Semantic encoders were evaluated under AWGN
+($\text{SNR} \in \{0, 5, 10, 20\}$\,dB) and packet loss
+(rate $\in \{1\%, 5\%, 10\%\}$).
+Results are presented in Tables~\ref{tab:awgn}--\ref{tab:efficiency}.
+
+\begin{table}[htbp]
+\caption{Semantic Accuracy under AWGN Channel (CIFAR-10 Test Set)}
+\label{tab:awgn}
+\begin{center}
+\begin{tabular}{ccccc}
+\toprule
+\textbf{Latent Dim} & \textbf{0\,dB} & \textbf{5\,dB} & \textbf{10\,dB} & \textbf{20\,dB} \\
+\midrule
+64  & 88.67\% & 91.32\% & 91.94\% & 92.52\% \\
+128 & 90.49\% & 91.92\% & 92.14\% & 92.40\% \\
+256 & 91.43\% & 92.16\% & 92.16\% & 92.37\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table}[htbp]
+\caption{Semantic Accuracy under Packet Loss}
+\label{tab:pktloss}
+\begin{center}
+\begin{tabular}{cccc}
+\toprule
+\textbf{Latent Dim} & \textbf{Loss 1\%} & \textbf{Loss 5\%} & \textbf{Loss 10\%} \\
+\midrule
+64  & 92.46\% & 92.24\% & 92.32\% \\
+128 & 92.21\% & 92.32\% & 92.18\% \\
+256 & 92.40\% & 92.41\% & 92.45\% \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table}[htbp]
+\caption{Communication Efficiency at SNR = 10\,dB}
+\label{tab:efficiency}
+\begin{center}
+\begin{tabular}{lccc}
+\toprule
+\textbf{Method} & \textbf{Bytes} & \textbf{Top-1 Acc.} & \textbf{ApB ($\times10^{-4}$)} \\
+\midrule
+JPEG $q$=60 (best ApB) & 853.8  & 78.83\% & 1.15 \\
+JPEG $q$=95            & 1{,}300.8 & 91.70\% & 0.88 \\
+\textbf{Semantic dim=64}  & \textbf{64}  & \textbf{91.94\%} & \textbf{17.96} \\
+Semantic dim=128       & 128    & 92.14\% & 8.99 \\
+Semantic dim=256       & 256    & 92.16\% & 4.50 \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+% ──────────────────────────────────────────────
+\section{Preliminary Findings}
+
+\textbf{(1) Dramatic bandwidth reduction.}
+Semantic dim=64 achieves 91.94\% accuracy using only 64\,bytes---2.1\% of the
+3{,}072-byte lossless baseline---while JPEG requires 1{,}301\,bytes to reach
+comparable accuracy (91.70\%).
+
+\textbf{(2) Communication efficiency.}
+Semantic dim=64 achieves an accuracy per bit of $17.96{\times}10^{-4}$,
+approximately \textbf{15.6$\times$ higher} than the best JPEG configuration
+($q$=60, $1.15{\times}10^{-4}$).
+
+\textbf{(3) AWGN robustness.}
+Even at SNR\,=\,0\,dB, Semantic dim=256 maintains 91.43\% accuracy.
+The dim=64 model shows greater sensitivity to low SNR (88.67\% at 0\,dB) owing
+to its compressed representation.
+
+\textbf{(4) Packet loss robustness.}
+All semantic models are remarkably robust to packet loss.
+The dim=256 accuracy fluctuates by less than 0.05\% across 1\%--10\% loss
+rates, suggesting that the latent representation distributes task-relevant
+information redundantly across dimensions.
+
+% ──────────────────────────────────────────────
+\section{Updated Project Schedule}
+
+Table~\ref{tab:gantt} summarizes the updated Gantt chart.
+No major deviations from the original plan occurred.
+The full evaluation of Rayleigh fading was deferred to the next phase
+(April 9--20) to prioritize the submission of this report.
+
+\begin{table}[htbp]
+\caption{Updated Project Schedule (Gantt Chart)}
+\label{tab:gantt}
+\begin{center}
+\begin{tabular}{p{2.6cm} p{2.8cm} p{1.8cm}}
+\toprule
+\textbf{Period} & \textbf{Activity} & \textbf{Milestone} \\
+\midrule
+03/13 -- 03/17 & Environment setup, baseline training & --- \\
+03/18 & Proposal submission & Proposal \checkmark \\
+03/19 -- 04/07 & Semantic encoder dev., initial experiments & --- \\
+04/08 & Progress Report submission & This report \checkmark \\
+04/09 -- 04/20 & Extended experiments (Rayleigh, Tiny-ImageNet) & --- \\
+04/21 -- 05/10 & Statistical repetition (5 runs) & --- \\
+05/11 -- 05/20 & Final report writing, slides & --- \\
+05/27 & Presentation & Slides + Demo \\
+06/03 & Final report submission & IEEE format \\
+\bottomrule
+\end{tabular}
+\end{center}
+\end{table}
+
+% ──────────────────────────────────────────────
+\section{Remaining Work}
+
+\begin{itemize}
+    \item \textbf{Extended channel evaluation:} Full Rayleigh fading sweep
+          across all latent dimensions.
+    \item \textbf{Statistical rigor:} Repeat all experiments 5 times (seed
+          sweep) and report mean $\pm$ std.
+    \item \textbf{Tiny-ImageNet:} Extend dataset if time permits (originally
+          planned as optional).
+    \item \textbf{Vector quantization:} Compare K-means VQ against scalar
+          quantization.
+    \item \textbf{Final report:} IEEE conference format, 10$+$ references.
+\end{itemize}
+
+% ──────────────────────────────────────────────
+\begin{thebibliography}{00}
+
+\bibitem{b1}
+Z. Qin, X. Tao, J. Lu, and G. Y. Li,
+``Semantic communications: Principles and challenges,''
+\textit{arXiv preprint arXiv:2212.00032}, 2021.
+
+\bibitem{b2}
+S. Sukhbaatar, A. Szlam, and J. Weston,
+``Learning multiagent communication with backpropagation,''
+\textit{arXiv preprint arXiv:1605.07736}, 2016.
+
+\bibitem{b3}
+E. Bourtsoulatze, D. B. Kurka, and D. G\"{u}nd\"{u}z,
+``Deep joint source-channel coding for wireless image transmission,''
+\textit{IEEE Trans. Cogn. Commun. Netw.}, vol.~5, no.~3, pp.~567--579, 2019.
+
+\bibitem{b4}
+K. He, X. Zhang, S. Ren, and J. Sun,
+``Deep residual learning for image recognition,''
+in \textit{Proc. IEEE CVPR}, 2016, pp.~770--778.
+
+\end{thebibliography}
+
+\end{document}
