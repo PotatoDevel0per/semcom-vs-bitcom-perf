@@ -1,0 +1,156 @@
+{
+  "best_acc": 0.9233,
+  "latent_dim": 128,
+  "history": [
+    {
+      "epoch": 1,
+      "test_acc": 0.4889,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 2,
+      "test_acc": 0.6338,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 3,
+      "test_acc": 0.633,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 4,
+      "test_acc": 0.7091,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 5,
+      "test_acc": 0.7689,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 6,
+      "test_acc": 0.7645,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 7,
+      "test_acc": 0.81,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 8,
+      "test_acc": 0.8114,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 9,
+      "test_acc": 0.8186,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 10,
+      "test_acc": 0.8476,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 11,
+      "test_acc": 0.845,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 12,
+      "test_acc": 0.8345,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 13,
+      "test_acc": 0.8656,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 14,
+      "test_acc": 0.8771,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 15,
+      "test_acc": 0.8753,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 16,
+      "test_acc": 0.8783,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 17,
+      "test_acc": 0.8832,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 18,
+      "test_acc": 0.8988,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 19,
+      "test_acc": 0.9019,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 20,
+      "test_acc": 0.9003,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 21,
+      "test_acc": 0.913,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 22,
+      "test_acc": 0.9119,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 23,
+      "test_acc": 0.9138,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 24,
+      "test_acc": 0.9161,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 25,
+      "test_acc": 0.9205,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 26,
+      "test_acc": 0.9194,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 27,
+      "test_acc": 0.921,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 28,
+      "test_acc": 0.9221,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 29,
+      "test_acc": 0.9233,
+      "avg_bytes": 128.0
+    },
+    {
+      "epoch": 30,
+      "test_acc": 0.9232,
+      "avg_bytes": 128.0
+    }
+  ]
+}

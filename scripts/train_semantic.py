@@ -33,8 +33,13 @@ def train(cfg):
 
     encoder = SemanticEncoder(latent_dim=cfg.model.latent_dim).to(device)
     head = SemanticClassifierHead(latent_dim=cfg.model.latent_dim).to(device)
-    channel = AWGNChannel(snr_db=cfg.channel.snr_db)
     quantizer = ScalarQuantizer()
+
+    channel_aware = bool(cfg.train.get("channel_aware", False))
+    snr_min = float(cfg.train.get("snr_min", 0.0))
+    snr_max = float(cfg.train.get("snr_max", 20.0))
+    if channel_aware:
+        logger.info(f"Channel-aware training: random AWGN SNR ∈ [{snr_min}, {snr_max}] dB per batch")
 
     criterion = nn.CrossEntropyLoss()
     optimizer = torch.optim.Adam(
@@ -55,6 +60,9 @@ def train(cfg):
             x, y = x.to(device), y.to(device)
             optimizer.zero_grad()
             z = encoder(x)
+            if channel_aware:
+                snr_train = float(torch.empty(1).uniform_(snr_min, snr_max).item())
+                z = AWGNChannel(snr_db=snr_train)(z)
             logits = head(z)
             loss = criterion(logits, y)
             loss.backward()
@@ -84,18 +92,22 @@ def train(cfg):
 
         if acc > best_acc:
             best_acc = acc
-            ckpt_path = f"experiments/checkpoints/semantic_enc_dim{cfg.model.latent_dim}.pth"
+            tag = "aware" if channel_aware else "naive"
+            suffix = "_aware" if channel_aware else ""
+            ckpt_path = f"experiments/checkpoints/semantic_enc{suffix}_dim{cfg.model.latent_dim}.pth"
             save_checkpoint(
                 {"epoch": epoch, "encoder_state_dict": encoder.state_dict(),
                  "head_state_dict": head.state_dict(), "acc": acc,
-                 "latent_dim": cfg.model.latent_dim},
+                 "latent_dim": cfg.model.latent_dim, "training": tag,
+                 "snr_range": [snr_min, snr_max] if channel_aware else None},
                 ckpt_path,
             )
 
     logger.info(f"Best accuracy: {best_acc:.4f}")
 
     os.makedirs("experiments/results", exist_ok=True)
-    out_path = f"experiments/results/semantic_dim{cfg.model.latent_dim}_training.json"
+    suffix = "_aware" if channel_aware else ""
+    out_path = f"experiments/results/semantic{suffix}_dim{cfg.model.latent_dim}_training.json"
     with open(out_path, "w") as f:
         json.dump({"best_acc": best_acc, "latent_dim": cfg.model.latent_dim, "history": results}, f, indent=2)
 
@@ -106,6 +118,10 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default="configs/train_semantic.yaml")
     parser.add_argument("--latent_dim", type=int, default=None)
+    parser.add_argument("--channel_aware", action="store_true",
+                        help="매 batch마다 random SNR sampling으로 channel-aware 학습")
+    parser.add_argument("--snr_min", type=float, default=0.0)
+    parser.add_argument("--snr_max", type=float, default=20.0)
     args = parser.parse_args()
 
     base = OmegaConf.load("configs/default.yaml")
@@ -113,5 +129,9 @@ if __name__ == "__main__":
     cfg = OmegaConf.merge(base, override)
     if args.latent_dim is not None:
         cfg.model.latent_dim = args.latent_dim
+    if args.channel_aware:
+        cfg.train.channel_aware = True
+        cfg.train.snr_min = args.snr_min
+        cfg.train.snr_max = args.snr_max
 
     train(cfg)

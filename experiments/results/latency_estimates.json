@@ -1,0 +1,99 @@
+{
+  "links_bps": {
+    "LoRa (IoT)": 1000,
+    "LTE-M": 1000000,
+    "5G mid-band": 100000000
+  },
+  "methods": [
+    {
+      "method": "Raw (lossless)",
+      "bytes": 3072,
+      "top1_acc": 0.9336,
+      "latency_ms": {
+        "LoRa (IoT)": 24576.0,
+        "LTE-M": 24.576,
+        "5G mid-band": 0.24575999999999998
+      }
+    },
+    {
+      "method": "JPEG q=60",
+      "bytes": 853.8,
+      "top1_acc": 0.7949,
+      "latency_ms": {
+        "LoRa (IoT)": 6830.4,
+        "LTE-M": 6.830399999999999,
+        "5G mid-band": 0.068304
+      }
+    },
+    {
+      "method": "JPEG q=95",
+      "bytes": 1300.8,
+      "top1_acc": 0.9142,
+      "latency_ms": {
+        "LoRa (IoT)": 10406.4,
+        "LTE-M": 10.4064,
+        "5G mid-band": 0.104064
+      }
+    },
+    {
+      "method": "Semantic Scalar dim=64 (AWGN 10dB)",
+      "bytes": 64.0,
+      "top1_acc": 0.91838,
+      "latency_ms": {
+        "LoRa (IoT)": 512.0,
+        "LTE-M": 0.512,
+        "5G mid-band": 0.00512
+      }
+    },
+    {
+      "method": "Semantic Scalar dim=128 (AWGN 10dB)",
+      "bytes": 128.0,
+      "top1_acc": 0.9233399999999999,
+      "latency_ms": {
+        "LoRa (IoT)": 1024.0,
+        "LTE-M": 1.024,
+        "5G mid-band": 0.01024
+      }
+    },
+    {
+      "method": "Semantic Scalar dim=256 (AWGN 10dB)",
+      "bytes": 256.0,
+      "top1_acc": 0.9202199999999999,
+      "latency_ms": {
+        "LoRa (IoT)": 2048.0,
+        "LTE-M": 2.048,
+        "5G mid-band": 0.02048
+      }
+    },
+    {
+      "method": "Semantic VQ dim=64 K=1024",
+      "bytes": 1.25,
+      "top1_acc": 0.9196,
+      "latency_ms": {
+        "LoRa (IoT)": 10.0,
+        "LTE-M": 0.01,
+        "5G mid-band": 9.999999999999999e-05
+      }
+    },
+    {
+      "method": "Semantic VQ dim=128 K=64",
+      "bytes": 0.75,
+      "top1_acc": 0.922,
+      "latency_ms": {
+        "LoRa (IoT)": 6.0,
+        "LTE-M": 0.006,
+        "5G mid-band": 5.9999999999999995e-05
+      }
+    },
+    {
+      "method": "Semantic VQ dim=256 K=64",
+      "bytes": 0.75,
+      "top1_acc": 0.9193,
+      "latency_ms": {
+        "LoRa (IoT)": 6.0,
+        "LTE-M": 0.006,
+        "5G mid-band": 5.9999999999999995e-05
+      }
+    }
+  ]
+}

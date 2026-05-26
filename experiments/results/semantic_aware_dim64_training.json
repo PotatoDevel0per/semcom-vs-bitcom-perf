@@ -1,0 +1,156 @@
+{
+  "best_acc": 0.9269,
+  "latent_dim": 64,
+  "history": [
+    {
+      "epoch": 1,
+      "test_acc": 0.5241,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 2,
+      "test_acc": 0.4943,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 3,
+      "test_acc": 0.7123,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 4,
+      "test_acc": 0.7357,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 5,
+      "test_acc": 0.7394,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 6,
+      "test_acc": 0.819,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 7,
+      "test_acc": 0.7942,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 8,
+      "test_acc": 0.8141,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 9,
+      "test_acc": 0.8236,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 10,
+      "test_acc": 0.8497,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 11,
+      "test_acc": 0.8631,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 12,
+      "test_acc": 0.8575,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 13,
+      "test_acc": 0.8455,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 14,
+      "test_acc": 0.8702,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 15,
+      "test_acc": 0.8812,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 16,
+      "test_acc": 0.8864,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 17,
+      "test_acc": 0.8908,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 18,
+      "test_acc": 0.9036,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 19,
+      "test_acc": 0.9064,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 20,
+      "test_acc": 0.9087,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 21,
+      "test_acc": 0.9042,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 22,
+      "test_acc": 0.9099,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 23,
+      "test_acc": 0.9119,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 24,
+      "test_acc": 0.9206,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 25,
+      "test_acc": 0.9226,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 26,
+      "test_acc": 0.9228,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 27,
+      "test_acc": 0.9263,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 28,
+      "test_acc": 0.9254,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 29,
+      "test_acc": 0.9261,
+      "avg_bytes": 64.0
+    },
+    {
+      "epoch": 30,
+      "test_acc": 0.9269,
+      "avg_bytes": 64.0
+    }
+  ]
+}

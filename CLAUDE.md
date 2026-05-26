@@ -35,6 +35,9 @@ python scripts/eval_baseline.py --config configs/default.yaml
 
 # 5. 결과 시각화 (experiments/results/*.json → experiments/figures/*.png)
 python scripts/plot_results.py
+
+# 6. 추정 전송 지연 계산 (LoRa/LTE-M/5G 가정) — proposal §5 보조지표
+python scripts/compute_latency.py
 ```
 
 진행 보고용으로 epoch 수 / repeat 수를 축소한 [configs/quick_run.yaml](configs/quick_run.yaml) 이 별도로 존재한다.

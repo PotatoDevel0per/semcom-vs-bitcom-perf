@@ -44,10 +44,15 @@ pip install -r requirements.txt
 # 1. 분류기 사전학습
 python scripts/train_classifier.py --config configs/train_classifier.yaml
 
-# 2. Semantic Encoder 학습 (latent_dim 64/128/256)
+# 2a. Semantic Encoder 학습 (channel-naive)
 python scripts/train_semantic.py --config configs/train_semantic.yaml --latent_dim 64
 python scripts/train_semantic.py --config configs/train_semantic.yaml --latent_dim 128
 python scripts/train_semantic.py --config configs/train_semantic.yaml --latent_dim 256
+
+# 2b. Channel-aware Semantic Encoder 학습 (random SNR ∈ [0, 20] dB sampling)
+python scripts/train_semantic.py --config configs/train_semantic.yaml --latent_dim 64  --channel_aware
+python scripts/train_semantic.py --config configs/train_semantic.yaml --latent_dim 128 --channel_aware
+python scripts/train_semantic.py --config configs/train_semantic.yaml --latent_dim 256 --channel_aware
 
 # 3. 평가 (Semantic + Baseline)
 python scripts/eval_semantic.py --config configs/default.yaml
@@ -55,6 +60,9 @@ python scripts/eval_baseline.py --config configs/default.yaml
 
 # 4. 그래프 생성
 python scripts/plot_results.py
+
+# 5. 추정 전송 지연 계산 (LoRa / LTE-M / 5G 가정)
+python scripts/compute_latency.py
 ```
 
 ## 평가 조건
@@ -75,12 +83,16 @@ python scripts/plot_results.py
 
 ### 1. 학습된 모델 정확도
 
-| 모델 | 전송 크기 | Top-1 Test Accuracy |
-|:-----|:---------:|:-------------------:|
-| ResNet-18 (분류기 baseline, 무손실 입력) | 3,072 B | **0.9336** |
-| Semantic Encoder dim=64 (스칼라 양자화) | 64 B | 0.9224 |
-| Semantic Encoder dim=128 (스칼라 양자화) | 128 B | 0.9255 |
-| Semantic Encoder dim=256 (스칼라 양자화) | 256 B | 0.9213 |
+두 학습 방식을 비교: **channel-naive** (학습 시 채널 미적용) 와 **channel-aware** (매 batch마다 AWGN SNR ∈ [0, 20] dB 무작위 샘플링).
+
+| 모델 | 전송 크기 | Channel-naive | Channel-aware (SNR sampling) |
+|:-----|:---------:|:-------------:|:----------------------------:|
+| ResNet-18 (분류기 baseline) | 3,072 B | 0.9336 | — |
+| Semantic Encoder dim=64 | 64 B | 0.9224 | 0.9269 |
+| Semantic Encoder dim=128 | 128 B | 0.9255 | 0.9233 |
+| Semantic Encoder dim=256 | 256 B | 0.9213 | 0.9215 |
+
+→ Noise-free 평가에서는 거의 동일하나, **낮은 SNR 환경에서 channel-aware가 큰 폭으로 우세** (§5.5 참조).
 
 ### 2. JPEG Baseline (분류기는 무손실 학습된 ResNet-18 재사용)
 
@@ -137,7 +149,47 @@ K-means codebook을 train set의 latent 분포에 fit한 후, test 시 인덱스
 → **dim=128 + K=64 codebook → 단 0.75 B (= 6 bits)로 92.20% 정확도.**
 → JPEG q=95 (1,300 B, 91.42%)와 정확도 동등하면서 약 **1,700배 적은 대역폭**.
 
-### 7. 통신 효율 비교 (Accuracy per Bit)
+### 6.5. Ablation: Channel-naive vs Channel-aware Training
+
+학계 표준의 **SNR-adaptive training**(매 batch마다 AWGN SNR ∈ [0, 20] dB 무작위 샘플링)을 도입한 후 동일 sweep에서 비교. 모든 평가는 5회 반복 mean ± std.
+
+**AWGN — Channel-aware 정확도 (Δ = aware − naive)**
+
+| dim | 0 dB | 5 dB | 10 dB | 20 dB |
+|:---:|:-----|:-----|:------|:------|
+| 64  | 0.9149 ± 0.0013 (**+2.83**) | 0.9227 ± 0.0011 (+1.15) | 0.9250 ± 0.0007 (+0.66) | 0.9265 ± 0.0002 (+0.51) |
+| 128 | 0.9148 ± 0.0005 (+0.73)     | 0.9202 ± 0.0009 (−0.01) | 0.9221 ± 0.0005 (−0.12) | 0.9230 ± 0.0004 (−0.25) |
+| 256 | 0.9180 ± 0.0009 (+0.48)     | 0.9211 ± 0.0008 (+0.26) | 0.9220 ± 0.0005 (+0.18) | 0.9217 ± 0.0001 (+0.05) |
+
+**Rayleigh — Channel-aware 정확도 (Δ = aware − naive)**
+
+| dim | 0 dB | 5 dB | 10 dB | 20 dB |
+|:---:|:-----|:-----|:------|:------|
+| 64  | 0.9145 ± 0.0017 (**+3.03**) | 0.9230 ± 0.0009 (+1.18) | 0.9251 ± 0.0003 (+0.70) | 0.9263 ± 0.0003 (+0.47) |
+| 128 | 0.9153 ± 0.0007 (+0.93)     | 0.9208 ± 0.0002 (+0.26) | 0.9228 ± 0.0005 (+0.08) | 0.9235 ± 0.0003 (−0.17) |
+| 256 | 0.9178 ± 0.0010 (+0.65)     | 0.9211 ± 0.0004 (+0.34) | 0.9215 ± 0.0004 (+0.19) | 0.9218 ± 0.0004 (+0.08) |
+
+→ **dim=64 + 저SNR (0 dB)** 조합에서 효과가 가장 크며, AWGN 0 dB에서 **+2.83%p**, Rayleigh 0 dB에서 **+3.03%p** 향상.
+→ 고 SNR (20 dB)에서는 dim=128에 한해 −0.25%p 미미한 trade-off — 학습 분포의 변화에 따른 자연스러운 비용. 다른 dim/SNR 조합에서는 모두 향상 또는 보존.
+→ Channel-aware dim=64는 AWGN/Rayleigh 모든 SNR에서 channel-naive dim=128보다 우수 — **작은 latent도 다양한 채널 노출로 더 강건한 표현을 학습**함을 시사.
+
+### 7. 추정 전송 지연 (Estimated Transmission Latency)
+
+각 방식의 평균 페이로드 크기에 가정된 전송률을 적용해 단일 이미지 전송 지연을 계산. Proposal §5 보조지표.
+
+| 방식 | 평균 바이트 | Top-1 Acc | LoRa (1 kbps) | LTE-M (1 Mbps) | 5G (100 Mbps) |
+|:-----|:-----------:|:---------:|:-------------:|:--------------:|:-------------:|
+| Raw (lossless) | 3,072 B | 93.36% | 24.58 s | 24.58 ms | 246 µs |
+| JPEG q=60 | 853.8 B | 79.49% | 6.83 s | 6.83 ms | 68.3 µs |
+| JPEG q=95 | 1,300.8 B | 91.42% | 10.41 s | 10.41 ms | 104 µs |
+| Semantic Scalar dim=64 (AWGN 10dB) | 64 B | 91.84% | 512 ms | 512 µs | 5.1 µs |
+| Semantic Scalar dim=128 (AWGN 10dB) | 128 B | 92.33% | 1.02 s | 1.02 ms | 10.2 µs |
+| **Semantic VQ dim=128, K=64** | **0.75 B** | **92.20%** | **6 ms** | **6 µs** | **0.06 µs** |
+
+→ **LoRa 환경에서 Raw 24.58 s → Semantic VQ 6 ms** (약 **4,100배 단축**).
+→ **5G 환경에서 Semantic VQ는 60 ns** 수준으로, 실시간 추론 파이프라인의 네트워크 병목을 거의 제거.
+
+### 8. 통신 효율 비교 (Accuracy per Bit)
 
 | 방식 | 바이트 | Top-1 Acc | Acc/Bit |
 |:-----|:------:|:---------:|:-------:|
@@ -154,9 +206,11 @@ K-means codebook을 train set의 latent 분포에 fit한 후, test 시 인덱스
 ## 핵심 발견
 
 1. **Semantic + Vector quantization은 압도적 효율**: dim=128 + K=64 codebook으로 **6 bits 전송**에서 92.20% 정확도. JPEG가 동등 정확도를 내려면 약 1,700배 큰 페이로드가 필요하다.
-2. **Rayleigh 페이딩도 강건**: AWGN 대비 분산은 커지지만(2~5배), 평균 정확도 손실은 0.3%p 미만 (Perfect CSI 등화 가정).
-3. **dim별 trade-off**: 큰 latent (256)는 낮은 SNR에 더 강건, 작은 latent (64)는 acc/bit 효율이 우수. **dim=128이 균형 최적**.
-4. **5회 반복 std 매우 작음** (대부분 < 0.002): 채널 noise random성의 영향이 적고 결과 재현성이 매우 높다.
+2. **저대역폭 IoT에서 지연 시간 격차 극대화**: LoRa(1 kbps) 가정에서 Raw 24.58 s → Semantic VQ **6 ms** (약 4,100배 단축). 5G에서도 Semantic VQ는 60 ns 수준으로 네트워크 병목이 사실상 사라진다.
+3. **Channel-aware training은 저SNR에서 결정적**: dim=64 모델은 AWGN 0 dB에서 +2.83%p, Rayleigh 0 dB에서 +3.03%p 향상. **Channel-aware dim=64가 channel-naive dim=128보다 모든 SNR에서 우수** — 작은 latent도 다양한 채널 노출로 강건성 확보 가능.
+4. **Rayleigh 페이딩도 강건**: AWGN 대비 분산은 커지지만(2~5배), 평균 정확도 손실은 0.3%p 미만 (Perfect CSI 등화 가정).
+5. **dim별 trade-off**: 큰 latent (256)는 낮은 SNR에 더 강건, 작은 latent (64)는 acc/bit 효율이 우수. Channel-aware 도입 시 dim=64로도 충분.
+6. **5회 반복 std 매우 작음** (대부분 < 0.002): 채널 noise random성의 영향이 적고 결과 재현성이 매우 높다.
 
 자세한 그래프는 [experiments/figures/](experiments/figures/) 디렉토리 참조.
 

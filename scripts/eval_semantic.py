@@ -26,11 +26,13 @@ class IdentityChannel(BaseChannel):
         return x
 
 
-def load_semantic(latent_dim, device):
+def load_semantic(latent_dim, device, training="naive"):
+    """training: 'naive' (기존) | 'aware' (channel-aware random SNR 학습)"""
     encoder = SemanticEncoder(latent_dim=latent_dim).to(device)
     head = SemanticClassifierHead(latent_dim=latent_dim).to(device)
+    suffix = "_aware" if training == "aware" else ""
     ckpt = torch.load(
-        f"experiments/checkpoints/semantic_enc_dim{latent_dim}.pth",
+        f"experiments/checkpoints/semantic_enc{suffix}_dim{latent_dim}.pth",
         map_location=device, weights_only=False)
     encoder.load_state_dict(ckpt["encoder_state_dict"])
     head.load_state_dict(ckpt["head_state_dict"])
@@ -112,12 +114,14 @@ if __name__ == "__main__":
     repeat = int(cfg.eval.repeat)
     results = []
 
-    for latent_dim in [64, 128, 256]:
+    for training in ["naive", "aware"]:
+      for latent_dim in [64, 128, 256]:
         try:
-            encoder, head = load_semantic(latent_dim, device)
+            encoder, head = load_semantic(latent_dim, device, training=training)
         except FileNotFoundError:
-            logger.warning(f"Checkpoint not found for dim={latent_dim}; skip")
+            logger.warning(f"Checkpoint not found for dim={latent_dim} training={training}; skip")
             continue
+        logger.info(f"### Eval [{training}] dim={latent_dim} ###")
 
         # 1) AWGN SNR sweep
         for snr in cfg.eval.snr_sweep:
@@ -126,9 +130,9 @@ if __name__ == "__main__":
                                             AWGNChannel(snr_db=snr), scalar_q),
                 repeat, cfg.seed)
             stats["accuracy_per_bit"] = stats["top1_acc_mean"] / (stats["avg_bytes"] * 8)
-            r = {"method": "semantic", "quantizer": "scalar",
+            r = {"method": "semantic", "training": training, "quantizer": "scalar",
                  "latent_dim": latent_dim, "channel": "awgn", "snr_db": snr, **stats}
-            logger.info(f"dim={latent_dim} AWGN SNR={snr}dB: "
+            logger.info(f"[{training}] dim={latent_dim} AWGN SNR={snr}dB: "
                         f"{r['top1_acc_mean']:.4f}±{r['top1_acc_std']:.4f}")
             results.append(r)
 
@@ -139,9 +143,9 @@ if __name__ == "__main__":
                                             RayleighChannel(snr_db=snr), scalar_q),
                 repeat, cfg.seed)
             stats["accuracy_per_bit"] = stats["top1_acc_mean"] / (stats["avg_bytes"] * 8)
-            r = {"method": "semantic", "quantizer": "scalar",
+            r = {"method": "semantic", "training": training, "quantizer": "scalar",
                  "latent_dim": latent_dim, "channel": "rayleigh", "snr_db": snr, **stats}
-            logger.info(f"dim={latent_dim} Rayleigh SNR={snr}dB: "
+            logger.info(f"[{training}] dim={latent_dim} Rayleigh SNR={snr}dB: "
                         f"{r['top1_acc_mean']:.4f}±{r['top1_acc_std']:.4f}")
             results.append(r)
 
@@ -152,21 +156,21 @@ if __name__ == "__main__":
                                                  PacketLossChannel(loss_rate=lr), scalar_q),
                 repeat, cfg.seed)
             stats["accuracy_per_bit"] = stats["top1_acc_mean"] / (stats["avg_bytes"] * 8)
-            r = {"method": "semantic", "quantizer": "scalar",
+            r = {"method": "semantic", "training": training, "quantizer": "scalar",
                  "latent_dim": latent_dim, "channel": "packet_loss",
                  "loss_rate": loss_rate, **stats}
-            logger.info(f"dim={latent_dim} PacketLoss={loss_rate}: "
+            logger.info(f"[{training}] dim={latent_dim} PacketLoss={loss_rate}: "
                         f"{r['top1_acc_mean']:.4f}±{r['top1_acc_std']:.4f}")
             results.append(r)
 
         # 4) Vector quantizer 비교 (noiseless)
-        logger.info(f"=> K-means VQ fit (dim={latent_dim})")
+        logger.info(f"=> [{training}] K-means VQ fit (dim={latent_dim})")
         train_z = collect_train_latents(encoder, train_loader, device)
         for K in [16, 64, 256, 1024]:
             vq = VectorQuantizer(num_codes=K)
             vq.fit(train_z)
             acc, b = eval_vector(encoder, head, test_loader, device, vq)
-            r = {"method": "semantic", "quantizer": "vector",
+            r = {"method": "semantic", "training": training, "quantizer": "vector",
                  "latent_dim": latent_dim, "channel": "noiseless",
                  "num_codes": K, "top1_acc_mean": acc, "top1_acc_std": 0.0,
                  "avg_bytes": b, "repeat": 1,
