@@ -10,7 +10,7 @@ channel:
   snr_db: 10.0
 
 train:
-  epochs: 100
+  epochs: 30
   lr: 1.0e-3
   weight_decay: 1.0e-4
   scheduler: "cosine"

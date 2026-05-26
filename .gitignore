@@ -3,7 +3,7 @@ experiments/results/*.csv
 experiments/figures/*.png
 experiments/figures/*.pdf
 experiments/logs/
-data/
+/data/
 __pycache__/
 *.pyc
 *.pyo

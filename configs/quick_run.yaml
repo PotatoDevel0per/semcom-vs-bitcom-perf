@@ -1,11 +1,11 @@
 # Progress Report용 빠른 실험 설정 (epoch 수 축소)
 seed: 42
-device: "mps"
+device: "cuda"
 
 data:
   root: "./data"
   batch_size: 128
-  num_workers: 0   # macOS multiprocessing 이슈 방지
+  num_workers: 4
 
 model:
   latent_dim: 128

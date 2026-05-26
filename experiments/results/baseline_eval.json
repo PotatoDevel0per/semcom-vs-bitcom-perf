@@ -2,61 +2,61 @@
   {
     "method": "raw",
     "byte_budget": 3072,
-    "top1_acc": 0.9351,
-    "accuracy_per_bit": 3.8049316406250004e-05
+    "top1_acc": 0.9336,
+    "accuracy_per_bit": 3.798828125e-05
   },
   {
     "method": "jpeg_q1",
     "byte_budget": 654.6245,
-    "top1_acc": 0.2082,
-    "accuracy_per_bit": 3.975561562391875e-05
+    "top1_acc": 0.2013,
+    "accuracy_per_bit": 3.8438066402953144e-05
   },
   {
     "method": "jpeg_q3",
     "byte_budget": 658.1613,
-    "top1_acc": 0.2219,
-    "accuracy_per_bit": 4.2143924293330526e-05
+    "top1_acc": 0.2163,
+    "accuracy_per_bit": 4.1080355225990956e-05
   },
   {
     "method": "jpeg_q5",
     "byte_budget": 671.091,
-    "top1_acc": 0.2789,
-    "accuracy_per_bit": 5.194899052438492e-05
+    "top1_acc": 0.2911,
+    "accuracy_per_bit": 5.422140961508946e-05
   },
   {
     "method": "jpeg_q10",
     "byte_budget": 699.4564,
-    "top1_acc": 0.4247,
-    "accuracy_per_bit": 7.589822610816057e-05
+    "top1_acc": 0.4354,
+    "accuracy_per_bit": 7.781042535317426e-05
   },
   {
     "method": "jpeg_q20",
     "byte_budget": 741.5475,
-    "top1_acc": 0.5922,
-    "accuracy_per_bit": 9.982502806630727e-05
+    "top1_acc": 0.5997,
+    "accuracy_per_bit": 0.00010108927614212171
   },
   {
     "method": "jpeg_q40",
     "byte_budget": 801.3178,
-    "top1_acc": 0.7263,
-    "accuracy_per_bit": 0.00011329774528907256
+    "top1_acc": 0.7301,
+    "accuracy_per_bit": 0.00011389051884283614
   },
   {
     "method": "jpeg_q60",
     "byte_budget": 853.779,
-    "top1_acc": 0.7883,
-    "accuracy_per_bit": 0.00011541335638379487
+    "top1_acc": 0.7949,
+    "accuracy_per_bit": 0.00011637964859758791
   },
   {
     "method": "jpeg_q80",
     "byte_budget": 960.6455,
-    "top1_acc": 0.8536,
-    "accuracy_per_bit": 0.0001110711495551689
+    "top1_acc": 0.8556,
+    "accuracy_per_bit": 0.00011133139123641343
   },
   {
     "method": "jpeg_q95",
     "byte_budget": 1300.8323,
-    "top1_acc": 0.917,
-    "accuracy_per_bit": 8.811666192483074e-05
+    "top1_acc": 0.9142,
+    "accuracy_per_bit": 8.78476034151366e-05
   }
 ]
